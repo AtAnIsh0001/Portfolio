@@ -1,4 +1,5 @@
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
+import type { MutableRefObject } from 'react'
 import { Canvas, extend, useFrame, type ReactThreeFiber } from '@react-three/fiber'
 import * as THREE from 'three'
 import { constellationNodes, CONSTELLATION_ASPECT } from '@/data/constellation'
@@ -133,17 +134,27 @@ function buildGeometry(density: Density) {
   return geometry
 }
 
-function ParticleField({ progress, density }: { progress: number; density: Density }) {
+export interface ParticleFieldProps {
+  /** 0..1, reactive. Ignored when `progressRef` is provided. */
+  progress?: number
+  /** 0..1, imperative — takes priority over `progress`. For embedding inside a shared,
+   *  persistently-rendering Canvas driven by scroll, where per-frame React state would be wasteful. */
+  progressRef?: MutableRefObject<number>
+  density: Density
+}
+
+export function ParticleField({ progress, progressRef: externalProgressRef, density }: ParticleFieldProps) {
   const materialRef = useRef<ParticlePortraitMaterialImpl>(null)
   const geometry = useMemo(() => buildGeometry(density), [density])
-  const progressRef = useRef(0)
+  const smoothedProgress = useRef(0)
 
   useLayoutEffect(() => () => geometry.dispose(), [geometry])
 
   useFrame((state, delta) => {
     if (!materialRef.current) return
-    progressRef.current += (progress - progressRef.current) * Math.min(1, delta * 2.2)
-    materialRef.current.uniforms.uProgress.value = progressRef.current
+    const target = externalProgressRef ? externalProgressRef.current : (progress ?? 0)
+    smoothedProgress.current += (target - smoothedProgress.current) * Math.min(1, delta * 2.2)
+    materialRef.current.uniforms.uProgress.value = smoothedProgress.current
     materialRef.current.uniforms.uTime.value = state.clock.elapsedTime
   })
 

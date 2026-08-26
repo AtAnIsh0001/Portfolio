@@ -5,7 +5,8 @@ import { CursorProvider } from '@/context/CursorContext'
 import { usePrefersReducedMotion } from '@/lib/hooks'
 import { startSmoothScroll, stopSmoothScroll } from '@/lib/lenis'
 import RootLayout from '@/layout/RootLayout'
-import Home from '@/pages/Home'
+import HomeClassic from '@/pages/HomeClassic'
+import HomeCinematic from '@/pages/HomeCinematic'
 import ServicesPage from '@/pages/ServicesPage'
 import ProjectsPage from '@/pages/ProjectsPage'
 import ProjectDetailPage from '@/pages/ProjectDetailPage'
@@ -33,7 +34,9 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route element={<RootLayout />}>
-              <Route index element={<Home />} />
+              <Route index element={<HomeClassic />} />
+              {/* Cinematic rebuild-in-progress — not yet the live index route. Swap once complete. */}
+              <Route path="cinematic" element={<HomeCinematic />} />
               <Route path="services" element={<ServicesPage />} />
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="projects/:id" element={<ProjectDetailPage />} />

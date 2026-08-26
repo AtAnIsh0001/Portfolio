@@ -3,7 +3,7 @@ import CarouselSection from '@/components/hero/CarouselSection'
 import AboutSection from '@/components/about/AboutSection'
 import MarqueeSection from '@/components/MarqueeSection'
 
-export default function Home() {
+export default function HomeClassic() {
   return (
     <>
       <HeroSection />

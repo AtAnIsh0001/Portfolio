@@ -1,4 +1,5 @@
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
+import type { MutableRefObject } from 'react'
 import { Canvas, extend, useFrame, useThree, type ReactThreeFiber } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
@@ -75,7 +76,16 @@ declare global {
   }
 }
 
-function AvatarPlane({ hovered }: { hovered: boolean }) {
+interface AvatarPlaneProps {
+  hovered: boolean
+  /** 0..1, reactive — when provided, drives the dissolve directly instead of the hover tween. */
+  progress?: number
+  /** 0..1, imperative — takes priority over `progress`/`hovered`. For embedding inside a shared,
+   *  persistently-rendering Canvas driven by scroll, where per-frame React state would be wasteful. */
+  progressRef?: MutableRefObject<number>
+}
+
+export function AvatarPlane({ hovered, progress, progressRef }: AvatarPlaneProps) {
   const [texA, texB] = useTexture(['/assets/avatar-3d.png', '/assets/avatar-photo.png'])
   const materialRef = useRef<AvatarMaterialImpl>(null)
   const mixValue = useRef({ v: 0 })
@@ -83,9 +93,11 @@ function AvatarPlane({ hovered }: { hovered: boolean }) {
   // so the full portrait shows edge-to-edge with no crop, matching the DOM <img> beneath it.
   const { viewport } = useThree()
 
+  // Continuous `progress` (scroll-driven) takes over from the hover tween when provided.
   useMemo(() => {
+    if (progressRef || progress !== undefined) return
     gsap.to(mixValue.current, { v: hovered ? 1 : 0, duration: 0.9, ease: 'power3.out' })
-  }, [hovered])
+  }, [hovered, progress, progressRef])
 
   useLayoutEffect(() => {
     if (!materialRef.current) return
@@ -93,7 +105,11 @@ function AvatarPlane({ hovered }: { hovered: boolean }) {
     materialRef.current.uniforms.uTexB.value = texB
   }, [texA, texB])
 
-  useFrame(() => {
+  useFrame((_, delta) => {
+    const target = progressRef ? progressRef.current : progress
+    if (target !== undefined) {
+      mixValue.current.v += (target - mixValue.current.v) * Math.min(1, delta * 4)
+    }
     if (materialRef.current) {
       materialRef.current.uniforms.uMix.value = mixValue.current.v
     }
@@ -108,11 +124,19 @@ function AvatarPlane({ hovered }: { hovered: boolean }) {
   )
 }
 
-export default function AvatarCanvas({ hovered }: { hovered: boolean; reducedMotion?: boolean }) {
+export default function AvatarCanvas({
+  hovered,
+  progress,
+}: {
+  hovered: boolean
+  reducedMotion?: boolean
+  /** 0..1 — when provided, drives the dissolve directly instead of the hover tween (scroll-driven usage). */
+  progress?: number
+}) {
   return (
     <Canvas camera={{ position: [0, 0, 2.4], fov: 40 }} dpr={[1, 1.8]} gl={{ alpha: true }}>
       <Suspense fallback={null}>
-        <AvatarPlane hovered={hovered} />
+        <AvatarPlane hovered={hovered} progress={progress} />
       </Suspense>
     </Canvas>
   )
