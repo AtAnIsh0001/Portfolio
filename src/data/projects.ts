@@ -207,16 +207,24 @@ export const projects: Project[] = [
     title: 'User Management CRUD App',
     subtitle: 'Full-Stack Create/Read/Update/Delete Practice Build',
     description:
-      'A self-directed backend-fundamentals build: an Express + MongoDB (Mongoose) app with EJS views, structured as routes → controllers → models, implementing full create, read, update and delete flows for user records.',
+      'A self-directed backend-fundamentals build following a guided Express + MongoDB tutorial to learn the pattern: an Express + Mongoose app with EJS views, structured as routes → controllers → models, with create, read and delete flows working end-to-end for user records.',
     stack: ['Node.js', 'Express', 'MongoDB', 'EJS'],
     image: null,
     gallery: [],
     accent: '#252321',
-    role: 'Solo — self-directed backend build',
+    role: 'Solo — built while following a guided CRUD tutorial',
     architecture: [
-      'Express + MongoDB (Mongoose) with EJS views',
+      'Express + MongoDB (Mongoose) with EJS views for add/update-user forms',
       'Routes → controllers → models structure',
-      'Full create, read, update and delete flows for user records',
+      'Mongoose schema validates required name/email fields with a unique email constraint',
+      'Create, read and delete flows wired and working end-to-end',
+    ],
+    challenges: [
+      {
+        title: 'Update endpoint left unfinished',
+        detail:
+          "The route file wires PUT /api/users/:id to an update controller function that was never finished — the working implementation is commented out in favor of an incomplete draft. Create, read and delete all work; update is the one flow that didn't get finished in this pass.",
+      },
     ],
   },
   {
@@ -225,8 +233,8 @@ export const projects: Project[] = [
     title: 'Food DX',
     subtitle: 'Restaurant & Food-Delivery Front-End',
     description:
-      'A fully custom HTML, CSS and JavaScript restaurant front-end — hero banner, product showcase, testimonials and a newsletter capture flow, hand-built from static markup with no framework overhead.',
-    stack: ['HTML', 'CSS', 'JavaScript'],
+      'A fully custom HTML/SCSS restaurant front-end — hero banner, stats strip, product showcase, testimonial and FAQ sections and a newsletter signup section, hand-built from static markup with no framework overhead.',
+    stack: ['HTML', 'SCSS', 'CSS'],
     image: '/assets/food-dx/banner.png',
     gallery: [
       '/assets/food-dx/banner.png',
@@ -236,7 +244,12 @@ export const projects: Project[] = [
     ],
     accent: '#E9B48A',
     role: 'Solo — custom front-end build',
-    architecture: ['Hero banner and product showcase', 'Testimonials section', 'Newsletter capture flow', 'Hand-built HTML/CSS/JS, no framework'],
+    architecture: [
+      'Hero banner, stats strip, feature and product-showcase sections',
+      'Testimonial and FAQ sections, newsletter signup section, footer with social links',
+      'SCSS partials (variables, reset) compiled to CSS',
+      'Font Awesome icon set via CDN — otherwise hand-built HTML/SCSS, no framework, no JS',
+    ],
   },
   {
     id: 'graphics-showcase',
@@ -252,15 +265,17 @@ export const projects: Project[] = [
       '/assets/graphics/car-rent.png',
       '/assets/graphics/challenger.png',
       '/assets/graphics/music-ad.jpg',
+      '/assets/graphics/vespa-newyear.png',
     ],
     accent: '#B67E7D',
     featured: true,
     role: 'Solo design work — graphics design training',
     architecture: [
-      'Magazine cover composition and typography (Alia)',
-      'Automotive campaign print ad — rental brand',
-      'Automotive campaign print ad — Challenger',
-      'Music/entertainment ad compositing and retouching',
+      'Glamour magazine cover — editorial masthead type, layered cover-line hierarchy, celebrity photo cutout composited on a clean background',
+      'Car-rental banner — night-highway motion-streak background, product cutout compositing, CTA button and contact/social row',
+      'Dodge Challenger piece — moody pink/magenta duotone grade over an urban alley backdrop, with added smoke and headlight glow around the product shot',
+      'Concert poster ("Anshish Production") — sponsor/partner logo bar, artist lineup, script-style headline type over a smoke-lit stage photo',
+      'Vespa New Year ad — built to Vespa\'s own navy/red/white brand palette, tiled wordmark watermark, diagonal chevron frame separating offer copy from the product cutout',
     ],
   },
 ]
