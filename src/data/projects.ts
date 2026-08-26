@@ -35,11 +35,30 @@ export const projects: Project[] = [
     featured: true,
     role: 'Solo build',
     architecture: [
-      'Next.js/React/TypeScript front end for live schedules, results and standings',
-      'Python service powering explainable football predictions',
-      'Separate Python-driven F1 prediction engine — lap time, pit strategy, tyre strategy, fastest-lap probability',
-      'Interactive Three.js circuit replay layer',
-      'Docker for local orchestration/deployment of the multi-service setup',
+      'Next.js/React/TypeScript front end; scenario inputs hit a Next.js API route, which spawns a Python 3 (standard-library only) subprocess to compute predictions',
+      'Strict separation of concerns: live results/standings/pit data come only from the Jolpica F1 API, forecasts come only from local historical CSV archives — never blended',
+      'Lap-time model blends historical best pace with a circuit benchmark, plus consistency, temperature, rain and fuel-load penalty terms',
+      'Fastest-lap probability computed via a bounded sigmoid over a composite score',
+      'Robust statistics (median-based, not raw averages) to keep anomalous pit-stop outliers from skewing the model',
+      'Three.js circuit replay animates recorded lap pacing onto an approximate track shape — an explicit illustrative reconstruction, since free timing feeds carry no GPS trace',
+      'Dockerized deployment bundling the Node/Next.js server and Python engine together',
+    ],
+    challenges: [
+      {
+        title: 'No real telemetry to animate the circuit replay with',
+        detail:
+          'Public timing feeds give lap durations, not GPS traces, so there was no way to build a geometrically accurate 3D replay. Rather than fake precision, the replay is treated explicitly as an illustrative reconstruction driven by real lap-pacing data.',
+      },
+      {
+        title: 'Pit-stop data full of outliers',
+        detail:
+          'Red flags and penalties produce occasional pit stops many times longer than normal, which would badly skew a simple average. Switched to median-based statistics for pit-window and pace calculations instead of raw means.',
+      },
+      {
+        title: 'Cold-start drivers with no local history',
+        detail:
+          'A driver with no rows in the local CSV archive falls back to a same-circuit field median rather than guessing — and the system explicitly reports a zero-sample count and lowers its own confidence score instead of presenting false certainty.',
+      },
     ],
   },
   {
@@ -54,13 +73,21 @@ export const projects: Project[] = [
     gallery: ['/assets/graphics/ecomart-home.png', '/assets/graphics/ecomart-products.png'],
     accent: '#956959',
     featured: true,
-    role: 'Team of 5 — Introduction to Information Systems coursework',
-    timeline: 'University coursework project',
+    role: 'Team of 5 — Introduction to Information Systems coursework; collaborative front-end build',
+    timeline: 'Autumn Semester, Islington College',
     architecture: [
-      'Wireframed in Balsamiq before any code was written',
-      'Static HTML/CSS/JS build — Home, Products, Blog, Research and About pages',
-      'Client-side form validation with JavaScript',
-      'Working add-to-cart flow',
+      'Wireframed in Balsamiq across Home, Products, Blog, About Us and Research pages before any code was written',
+      'Vanilla HTML/CSS/JS build using Flexbox layout — no framework',
+      'Cart persisted client-side via localStorage — add, remove, change quantity, running subtotal',
+      'Client-side form validation on the contact form (name length, email format, minimum message length)',
+      'A dedicated Research page documenting the glassmorphism styling against reference sites (Apple, Stripe, Figma, Vercel)',
+    ],
+    challenges: [
+      {
+        title: 'Layout and responsiveness took longer than planned',
+        detail:
+          'As a team we hit more friction than expected getting page layout, interactive elements like the cart, and responsiveness working consistently across five pages — worked through with team coordination, tutor guidance, and better time management as the project progressed.',
+      },
     ],
   },
   {
@@ -75,18 +102,39 @@ export const projects: Project[] = [
     gallery: [],
     accent: '#8C6D2F',
     featured: true,
-    role: 'Team project — Introduction to Robotics & IoT coursework',
+    role: 'Team of 5 — Introduction to Robotics & IoT coursework (CC4003NI)',
     architecture: [
-      'ESP32 microcontroller reading turbidity and pH sensors',
-      'Solenoid valve, buzzer and LED indicators driven off sensor thresholds',
-      'Live monitoring over the Blynk app',
-      'Version-controlled on GitHub',
+      'ESP32 Dev Module reading a pH sensor and a turbidity sensor, each averaged over 10 samples to cut sensor noise',
+      'Safe-range logic (pH 6.5–8.0, turbidity under a calibrated threshold) drives a relay-controlled solenoid valve plus red/green LED and buzzer feedback',
+      '16x2 I2C LCD for live on-device readouts',
+      'Built and bench-tested module by module — LCD, LEDs, buzzer, relay, each sensor — individually before full integration, to isolate faults early',
+      'Arduino IDE / C++, version-controlled on GitHub; Blynk app planned for remote monitoring',
     ],
     challenges: [
       {
+        title: 'No prior embedded/MicroPython experience on the team',
+        detail:
+          'Nobody had written embedded code before, which pushed the actual coding start back by about a week while the team self-taught from documentation and tutorials.',
+      },
+      {
+        title: "LED indicator didn't track sensor state correctly",
+        detail:
+          'The green "safe" LED initially stayed solid on instead of responding to live readings. Traced and fixed through iterative debugging of the control logic and wiring.',
+      },
+      {
+        title: 'Sourcing the pH sensor and solenoid valve',
+        detail:
+          "Both parts were out of stock at the first electronics shops checked. The team split into sub-groups to canvas multiple stores in parallel and pooled costs to stay within budget.",
+      },
+      {
+        title: 'Design pivot on the valve mechanism',
+        detail:
+          "Started with a plan for a mini pump/valve, switched to a servo-actuated valve, then reverted to a relay-driven solenoid valve after real-world testing showed the servo's power needs and behavior didn't match the original design.",
+      },
+      {
         title: 'Validating across water conditions',
         detail:
-          'Tested the rig against clean, acidic and contaminated (baking-soda) water samples to confirm the sensors and valve logic responded correctly across the range, not just in ideal conditions.',
+          'Tested against clean tap water, a baking-soda solution and acidic water. The combined pH + turbidity logic correctly classified all three samples as safe or unsafe, matching expected results in every test.',
       },
     ],
   },
@@ -101,12 +149,30 @@ export const projects: Project[] = [
     image: null,
     gallery: [],
     accent: '#5C352C',
-    role: 'Solo — Java coursework project',
+    role: 'Solo — Java coursework project (CS4001NT)',
     architecture: [
-      'Abstract AIModel parent class',
-      'ProPlan subclass — team-seat management',
-      'PersonalPlan subclass — prompt purchasing & usage tracking',
-      'SubscriptionGUI controller with file export/import',
+      'Abstract AIModel parent class (Serializable) with PersonalPlan and ProPlan subclasses — inheritance and polymorphism via ArrayList<AIModel> + instanceof checks',
+      'PersonalPlan tracks a monthly prompt quota (purchase and spend prompts); ProPlan tracks team seats (add/remove members)',
+      'Java Swing GUI (SubscriptionGUI) with custom rounded text-field and button components',
+      'Dual file export — a human-readable subscriptions.txt (BufferedWriter) and a serialized subscriptions.dat (ObjectOutputStream) that can be reloaded',
+      'Verified against 6 structured test cases — add plan, purchase/spend prompts, add/remove team member, plan-type checks — all passed',
+    ],
+    challenges: [
+      {
+        title: 'Inverted comparison blocked valid prompt use',
+        detail:
+          'enterPrompt() originally checked if (promptRemaining < 0), so it refused every prompt even when the quota had plenty left. Root-caused during testing and corrected to > 0.',
+      },
+      {
+        title: 'Same inverted-logic bug in team management',
+        detail:
+          'addTeamMember() had the identical mistake — if (teamSlots < 0) — so it always reported no seats available even when slots were open. Fixed by flipping the comparison.',
+      },
+      {
+        title: 'Confusing crash on an empty plan list',
+        detail:
+          "Giving a prompt or checking a plan type before adding any plans threw a confusing \"Index must be between 0 and -1\" error. Added an explicit empty-list guard that shows a clear message instead.",
+      },
     ],
   },
   {
@@ -120,8 +186,20 @@ export const projects: Project[] = [
     image: null,
     gallery: [],
     accent: '#9C6B4F',
-    role: 'Solo — Fundamentals of Computing coursework',
-    architecture: ['Reads raw stock records from inventory.txt', 'Parses into structured data', 'Renders an aligned, formatted stock table'],
+    role: 'Solo — Fundamentals of Computing coursework (Milestone 1)',
+    architecture: [
+      'Reads raw stock records line by line from a text file',
+      'Stores each row as a list-of-lists in memory — a deliberate spreadsheet-style structure standing in for a real database',
+      'Strips and splits each line on commas to structure the data',
+      'Prints a fixed-width, aligned stock table',
+    ],
+    challenges: [
+      {
+        title: 'Hidden newline characters broke the table output',
+        detail:
+          "Python's file reads left invisible \\n characters at the end of every line, throwing off column alignment — and the coursework rules didn't allow using the built-in .strip() method. Solved it by manually replacing the newline character before splitting each line into columns.",
+      },
+    ],
   },
   {
     id: 'crud-app',

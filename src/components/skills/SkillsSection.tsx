@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { skillCategories, skills, type Skill } from '@/data/skills'
 import SkillBar from './SkillBar'
 import SkillsModal from './SkillsModal'
+import CertificationsSection from './CertificationsSection'
 import FadeIn from '@/components/FadeIn'
 import { BrainCircuitIcon, CodeWindowIcon, ChipSignalIcon, PenPaletteIcon, type LineIconProps } from '@/components/icons/LineIcons'
 
@@ -42,6 +43,8 @@ export default function SkillsSection() {
           )
         })}
       </div>
+
+      <CertificationsSection />
 
       <SkillsModal skill={active} onClose={() => setActive(null)} />
     </section>
