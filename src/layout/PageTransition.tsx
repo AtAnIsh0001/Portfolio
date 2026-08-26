@@ -29,9 +29,15 @@ export default function PageTransition() {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={location.pathname}
-          initial={{ opacity: 0, y: 26, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -18, filter: 'blur(10px)' }}
+          // Deliberately no `filter` here: framer-motion keeps re-asserting its
+          // animate-target value on every re-render (even blur(0px)), and any
+          // non-'none' filter on an ancestor creates a new containing block that
+          // silently breaks position:fixed descendants (e.g. the project/skills
+          // modals) rendered anywhere inside this route. Opacity + slide carries
+          // the transition; the gold scan line above is the signature effect.
+          initial={{ opacity: 0, y: 26 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -18 }}
           transition={{ duration: 0.55, ease: EASE_LUXE }}
         >
           <Outlet />
