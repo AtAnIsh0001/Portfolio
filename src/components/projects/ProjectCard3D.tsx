@@ -1,10 +1,12 @@
 import { Suspense, useRef, useState } from 'react'
 import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber'
 import { RoundedBox, useTexture, Lightformer, Environment } from '@react-three/drei'
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import type { Mesh } from 'three'
 import { useCursor } from '@/context/CursorContext'
 import { useWebGLSupport } from '@/lib/hooks'
+import { useDeviceTier } from '@/lib/deviceTier'
 import ProjectPreview from './ProjectPreview'
 import type { Project } from '@/data/projects'
 
@@ -91,17 +93,20 @@ function StudioLights() {
 
 export default function ProjectCard3D({ project }: { project: Project }) {
   const webglOk = useWebGLSupport()
+  const tier = useDeviceTier()
   const [ready, setReady] = useState(false)
 
   if (!webglOk) {
     return <ProjectPreview project={project} />
   }
 
+  const postprocessingOn = tier !== 'low'
+
   return (
     <div className="relative h-full w-full">
       <Canvas
         camera={{ position: [0, 0, 3.2], fov: 42 }}
-        dpr={[1, 1.75]}
+        dpr={tier === 'low' ? 1 : [1, 1.75]}
         onCreated={() => setReady(true)}
         style={{ opacity: ready ? 1 : 0, transition: 'opacity 0.4s ease' }}
       >
@@ -111,6 +116,12 @@ export default function ProjectCard3D({ project }: { project: Project }) {
           <StudioLights />
           <DragCard project={project} />
         </Suspense>
+        {postprocessingOn && (
+          <EffectComposer>
+            <Bloom intensity={0.55} luminanceThreshold={0.35} luminanceSmoothing={0.25} mipmapBlur radius={0.6} />
+            <Vignette eskil={false} offset={0.15} darkness={0.6} />
+          </EffectComposer>
+        )}
       </Canvas>
     </div>
   )

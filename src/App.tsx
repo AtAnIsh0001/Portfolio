@@ -11,6 +11,7 @@ import ProjectsPage from '@/pages/ProjectsPage'
 import ProjectDetailPage from '@/pages/ProjectDetailPage'
 import SkillsPage from '@/pages/SkillsPage'
 import ContactPage from '@/pages/ContactPage'
+import LabPage from '@/pages/LabPage'
 
 function SmoothScrollController() {
   const reducedMotion = usePrefersReducedMotion()
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="projects/:id" element={<ProjectDetailPage />} />
               <Route path="skills" element={<SkillsPage />} />
               <Route path="contact" element={<ContactPage />} />
+              {import.meta.env.DEV && <Route path="lab" element={<LabPage />} />}
             </Route>
           </Routes>
         </BrowserRouter>
