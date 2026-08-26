@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import type { MutableRefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
@@ -7,7 +7,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import * as THREE from 'three'
 import { AvatarPlane } from '@/components/hero/AvatarCanvas'
 import { ParticleField } from '@/components/home/ParticlePortrait'
-import { SCENE_BEATS, PARTICLES_STAGE_X, type Vec3 } from '@/lib/scrollScenes'
+import { DragCard, StudioLights } from '@/components/projects/ProjectCard3D'
+import { featuredProjects } from '@/data/projects'
+import { SCENE_BEATS, PARTICLES_STAGE_X, PROJECTS_STAGE_X, type Vec3 } from '@/lib/scrollScenes'
 import { useDeviceTier } from '@/lib/deviceTier'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -56,10 +58,13 @@ export default function HomeCanvasExperience() {
   const cameraTarget = useRef<CameraState>({ position: { x: 0.6, y: 0.1, z: 3.4 }, lookAt: { x: 0.15, y: 0, z: 0 } })
   const avatarProgress = useRef(0)
   const particlesProgress = useRef(0)
+  const projectsProgress = useRef(0)
   const progressRefs: Record<string, MutableRefObject<number>> = {
     avatar: avatarProgress,
     particles: particlesProgress,
+    projects: projectsProgress,
   }
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0)
 
   useEffect(() => {
     const triggers: ScrollTrigger[] = []
@@ -79,6 +84,10 @@ export default function HomeCanvasExperience() {
           ref.current = p
           lerpVec3(cameraTarget.current.position, beat.cameraFrom, beat.cameraTo, p)
           lerpVec3(cameraTarget.current.lookAt, beat.lookAtFrom, beat.lookAtTo, p)
+          if (beat.id === 'projects') {
+            const idx = Math.min(featuredProjects.length - 1, Math.floor(p * featuredProjects.length))
+            setActiveProjectIndex((prev) => (prev === idx ? prev : idx))
+          }
         },
       })
       triggers.push(trigger)
@@ -93,6 +102,9 @@ export default function HomeCanvasExperience() {
   const postprocessingOn = tier === 'high'
 
   return (
+    // pointer-events-none so scrolling/clicking the DOM content layered on top always
+    // works — the projects beat's drag-to-inspect is therefore auto-rotate only here
+    // (its own dedicated Canvas on the /projects pages keeps the interactive version).
     <div className="pointer-events-none fixed inset-0 z-0">
       <Canvas
         camera={{ position: [0.6, 0.1, 3.4], fov: 42 }}
@@ -100,12 +112,19 @@ export default function HomeCanvasExperience() {
         gl={{ alpha: true, antialias: false }}
       >
         <ambientLight intensity={0.4} />
+        {/* eslint-disable-next-line react/no-unknown-property */}
+        <directionalLight position={[3, 3, 4]} intensity={0.7} />
         <Suspense fallback={null}>
           <CameraRig targetRef={cameraTarget} />
           <AvatarPlane hovered={false} progressRef={avatarProgress} />
           {/* eslint-disable-next-line react/no-unknown-property */}
           <group position={[PARTICLES_STAGE_X, 0, 0]}>
             <ParticleField progressRef={particlesProgress} density={tier === 'high' ? 'high' : 'mid'} />
+          </group>
+          {/* eslint-disable-next-line react/no-unknown-property */}
+          <group position={[PROJECTS_STAGE_X, 0, 0]}>
+            <StudioLights />
+            <DragCard project={featuredProjects[activeProjectIndex]} />
           </group>
           {postprocessingOn && (
             <EffectComposer>
