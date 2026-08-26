@@ -4,6 +4,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import MarqueeSection from '@/components/MarqueeSection'
 import AboutSection from '@/components/about/AboutSection'
+import ContactSection from '@/components/ContactSection'
 import ConstellationPortrait from '@/components/ConstellationPortrait'
 import Magnet from '@/components/Magnet'
 import { featuredProjects } from '@/data/projects'
@@ -79,6 +80,7 @@ function HomeStatic() {
 
       <MarqueeSection />
       <AboutSection />
+      <ContactSection />
     </div>
   )
 }
@@ -151,14 +153,16 @@ function HomeCanvasJourney() {
 
       <MarqueeSection />
       <AboutSection />
+      <ContactSection />
     </div>
   )
 }
 
 /**
  * Cinematic rebuild of Home. Work in progress (Phase 4 of the rebuild plan):
- * avatar-dissolve, particle-portrait and projects-as-objects beats are wired up;
- * the about/contact beats below are still the existing DOM sections for now.
+ * avatar-dissolve, particle-portrait and projects-as-objects are scroll-driven
+ * 3D beats; marquee/about/contact below reuse the existing, already-solid DOM
+ * sections as-is, closing the "one continuous journey" loop end to end.
  * Not yet the live index route — preview at /cinematic.
  */
 export default function HomeCinematic() {
