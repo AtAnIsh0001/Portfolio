@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+*.tsbuildinfo
+
+# Raw personal source stash — not part of the deployed site (already mirrored into public/assets)
+/Cv and media/
+# Unrelated coursework archive, not part of the site
+/Projects/
+# Ad-hoc screenshot artifacts
+/undefined/
