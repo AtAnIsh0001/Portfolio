@@ -12,13 +12,19 @@ import type { Project } from '@/data/projects'
 
 const BLANK_TEXTURE = '/assets/logo.png'
 
+// drei's RoundedBox is built from THREE.ExtrudeGeometry, not BoxGeometry — it only
+// ever produces 2 material groups (confirmed against three.js's source): group 0 is
+// the front+back caps together (no way to target just one face with this geometry),
+// group 1 is the extruded side/rim walls. The previous material-0..material-5 setup
+// assumed 6 independent box faces, so the "identity" material never actually attached
+// to anything the geometry referenced — the card only ever showed its plain rim color.
 function TexturedFace({ image, accent }: { image: string | null; accent: string }) {
   const tex = useTexture(image ?? BLANK_TEXTURE)
   tex.colorSpace = THREE.SRGBColorSpace
   return image ? (
-    <meshPhysicalMaterial attach="material-4" map={tex} roughness={0.35} metalness={0.15} clearcoat={0.4} />
+    <meshPhysicalMaterial attach="material-0" map={tex} roughness={0.35} metalness={0.15} clearcoat={0.4} />
   ) : (
-    <meshPhysicalMaterial attach="material-4" color={accent} roughness={0.3} metalness={0.2} clearcoat={0.4} />
+    <meshPhysicalMaterial attach="material-0" color={accent} roughness={0.3} metalness={0.2} clearcoat={0.4} />
   )
 }
 
@@ -47,15 +53,22 @@ export function DragCard({ project }: { project: Project }) {
     velocity.current.x = dy * 0.008
   }
 
-  useFrame(() => {
+  useFrame((state) => {
     if (!meshRef.current) return
     rotation.current.y += velocity.current.y
     rotation.current.x += velocity.current.x
     velocity.current.y *= dragging.current ? 1 : 0.94
     velocity.current.x *= dragging.current ? 1 : 0.94
-    if (!dragging.current) {
-      rotation.current.y += 0.0025
+
+    // Once a drag-flick's momentum has mostly decayed, settle into a small, bounded
+    // idle sway instead of drifting forever — an unconditional += here previously
+    // meant the card would rotate fully away from its textured/accent front face
+    // within seconds of being left alone, reading as a plain dark slab.
+    if (!dragging.current && Math.abs(velocity.current.y) < 0.002) {
+      const idleTarget = Math.sin(state.clock.elapsedTime * 0.35) * 0.18
+      rotation.current.y += (idleTarget - rotation.current.y) * 0.02
     }
+
     meshRef.current.rotation.y = rotation.current.y
     meshRef.current.rotation.x = THREE.MathUtils.clamp(rotation.current.x, -0.6, 0.6)
   })
@@ -70,12 +83,8 @@ export function DragCard({ project }: { project: Project }) {
       onPointerLeave={() => setLabel(null)}
     >
       <RoundedBox args={[2.4, 1.5, 0.14]} radius={0.08} smoothness={4}>
-        <meshPhysicalMaterial attach="material-0" color="#151922" roughness={0.4} metalness={0.3} />
-        <meshPhysicalMaterial attach="material-1" color="#151922" roughness={0.4} metalness={0.3} />
-        <meshPhysicalMaterial attach="material-2" color="#151922" roughness={0.4} metalness={0.3} />
-        <meshPhysicalMaterial attach="material-3" color="#151922" roughness={0.4} metalness={0.3} />
         <TexturedFace image={project.image} accent={project.accent} />
-        <meshPhysicalMaterial attach="material-5" color="#08090A" roughness={0.6} metalness={0.1} />
+        <meshPhysicalMaterial attach="material-1" color="#151922" roughness={0.4} metalness={0.3} />
       </RoundedBox>
     </mesh>
   )
