@@ -28,7 +28,7 @@ function TexturedFace({ image, accent }: { image: string | null; accent: string 
   )
 }
 
-export function DragCard({ project }: { project: Project }) {
+function DragCard({ project }: { project: Project }) {
   const meshRef = useRef<Mesh>(null)
   const rotation = useRef({ x: -0.05, y: 0 })
   const velocity = useRef({ x: 0, y: 0 })
@@ -90,7 +90,7 @@ export function DragCard({ project }: { project: Project }) {
   )
 }
 
-export function StudioLights() {
+function StudioLights() {
   return (
     <Environment resolution={64}>
       <Lightformer intensity={2} color="#C9A24D" position={[-4, 2, 2]} scale={[3, 3, 1]} />

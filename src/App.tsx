@@ -5,14 +5,12 @@ import { CursorProvider } from '@/context/CursorContext'
 import { usePrefersReducedMotion } from '@/lib/hooks'
 import { startSmoothScroll, stopSmoothScroll } from '@/lib/lenis'
 import RootLayout from '@/layout/RootLayout'
-import HomeClassic from '@/pages/HomeClassic'
-import HomeCinematic from '@/pages/HomeCinematic'
+import Home from '@/pages/Home'
 import ServicesPage from '@/pages/ServicesPage'
 import ProjectsPage from '@/pages/ProjectsPage'
 import ProjectDetailPage from '@/pages/ProjectDetailPage'
 import SkillsPage from '@/pages/SkillsPage'
 import ContactPage from '@/pages/ContactPage'
-import LabPage from '@/pages/LabPage'
 
 function SmoothScrollController() {
   const reducedMotion = usePrefersReducedMotion()
@@ -34,15 +32,12 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route element={<RootLayout />}>
-              <Route index element={<HomeClassic />} />
-              {/* Cinematic rebuild-in-progress — not yet the live index route. Swap once complete. */}
-              <Route path="cinematic" element={<HomeCinematic />} />
+              <Route index element={<Home />} />
               <Route path="services" element={<ServicesPage />} />
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="projects/:id" element={<ProjectDetailPage />} />
               <Route path="skills" element={<SkillsPage />} />
               <Route path="contact" element={<ContactPage />} />
-              {import.meta.env.DEV && <Route path="lab" element={<LabPage />} />}
             </Route>
           </Routes>
         </BrowserRouter>
