@@ -11,6 +11,7 @@ import { DragCard, StudioLights } from '@/components/projects/ProjectCard3D'
 import { featuredProjects } from '@/data/projects'
 import { SCENE_BEATS, PARTICLES_STAGE_X, PROJECTS_STAGE_X, type Vec3 } from '@/lib/scrollScenes'
 import { useDeviceTier } from '@/lib/deviceTier'
+import { useAudio } from '@/context/AudioContext'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -65,6 +66,7 @@ export default function HomeCanvasExperience() {
     projects: projectsProgress,
   }
   const [activeProjectIndex, setActiveProjectIndex] = useState(0)
+  const { play } = useAudio()
 
   useEffect(() => {
     const triggers: ScrollTrigger[] = []
@@ -79,6 +81,10 @@ export default function HomeCanvasExperience() {
         start: 'top top',
         end: 'bottom top',
         scrub: 1.2,
+        // Fires once per crossing (either scroll direction), not on every scrub tick —
+        // a soft cue that a new beat has arrived, not a spam of sound on every frame.
+        onEnter: () => play('transition'),
+        onEnterBack: () => play('transition'),
         onUpdate: (self) => {
           const p = self.progress
           ref.current = p
