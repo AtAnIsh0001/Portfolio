@@ -77,25 +77,52 @@ function toneToBlobUrl(spec: ToneSpec): string {
   return URL.createObjectURL(blob)
 }
 
-export type SfxName = 'hover' | 'click' | 'whoosh' | 'ambient' | 'toggle'
+export type SfxName =
+  | 'hover'
+  | 'click'
+  | 'whoosh'
+  | 'toggle'
+  | 'open'
+  | 'close'
+  | 'drag'
+  | 'success'
+  | 'transition'
+
+type AmbientLayer = 'ambientLow' | 'ambientAir'
+
+const AMBIENT_LAYERS: AmbientLayer[] = ['ambientLow', 'ambientAir']
 
 class SoundEngine {
   private howls = new Map<SfxName, Howl>()
+  private ambientHowls = new Map<AmbientLayer, Howl>()
   private muted = true
-  private ambientId: number | null = null
+  private ambientIds = new Map<AmbientLayer, number>()
 
   constructor() {
     this.register('hover', { freqStart: 720, freqEnd: 980, duration: 0.09, shape: 'sine', gain: 0.14 })
     this.register('click', { freqStart: 260, freqEnd: 140, duration: 0.14, shape: 'triangle', gain: 0.28 })
     this.register('toggle', { freqStart: 440, freqEnd: 660, duration: 0.2, shape: 'sine', gain: 0.22 })
     this.register('whoosh', { freqStart: 180, freqEnd: 40, duration: 0.9, shape: 'sine', gain: 0.2, noiseMix: 0.35 })
-    this.register('ambient', { freqStart: 55, freqEnd: 58, duration: 6, shape: 'sine', gain: 0.05, noiseMix: 0.06 })
+    this.register('open', { freqStart: 320, freqEnd: 720, duration: 0.32, shape: 'sine', gain: 0.24, noiseMix: 0.04 })
+    this.register('close', { freqStart: 520, freqEnd: 220, duration: 0.24, shape: 'sine', gain: 0.2 })
+    this.register('drag', { freqStart: 140, freqEnd: 160, duration: 0.5, shape: 'triangle', gain: 0.1, noiseMix: 0.5 })
+    this.register('success', { freqStart: 440, freqEnd: 880, duration: 0.4, shape: 'sine', gain: 0.26 })
+    this.register('transition', { freqStart: 90, freqEnd: 30, duration: 1.1, shape: 'sine', gain: 0.16, noiseMix: 0.2 })
+
+    this.registerAmbient('ambientLow', { freqStart: 55, freqEnd: 58, duration: 6, shape: 'sine', gain: 0.05, noiseMix: 0.06 })
+    this.registerAmbient('ambientAir', { freqStart: 220, freqEnd: 240, duration: 8, shape: 'sine', gain: 0.02, noiseMix: 0.4 })
   }
 
   private register(name: SfxName, spec: ToneSpec) {
     const src = toneToBlobUrl(spec)
-    const howl = new Howl({ src: [src], format: ['wav'], loop: name === 'ambient', volume: name === 'ambient' ? 0.4 : 0.6 })
+    const howl = new Howl({ src: [src], format: ['wav'], volume: 0.6 })
     this.howls.set(name, howl)
+  }
+
+  private registerAmbient(name: AmbientLayer, spec: ToneSpec) {
+    const src = toneToBlobUrl(spec)
+    const howl = new Howl({ src: [src], format: ['wav'], loop: true, volume: name === 'ambientLow' ? 0.4 : 0.25 })
+    this.ambientHowls.set(name, howl)
   }
 
   setMuted(muted: boolean) {
@@ -112,17 +139,21 @@ class SoundEngine {
   }
 
   startAmbient() {
-    if (this.muted || this.ambientId !== null) return
-    const howl = this.howls.get('ambient')
-    if (howl) this.ambientId = howl.play()
+    if (this.muted) return
+    for (const layer of AMBIENT_LAYERS) {
+      if (this.ambientIds.has(layer)) continue
+      const howl = this.ambientHowls.get(layer)
+      if (howl) this.ambientIds.set(layer, howl.play())
+    }
   }
 
   stopAmbient() {
-    const howl = this.howls.get('ambient')
-    if (howl && this.ambientId !== null) {
-      howl.stop(this.ambientId)
-      this.ambientId = null
+    for (const layer of AMBIENT_LAYERS) {
+      const howl = this.ambientHowls.get(layer)
+      const id = this.ambientIds.get(layer)
+      if (howl && id !== undefined) howl.stop(id)
     }
+    this.ambientIds.clear()
   }
 }
 

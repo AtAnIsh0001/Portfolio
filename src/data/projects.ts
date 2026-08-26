@@ -10,6 +10,14 @@ export interface Project {
   gallery: string[]
   accent: string
   featured?: boolean
+  /** How the project was built — solo vs. team, and what part was mine. */
+  role?: string
+  timeline?: string
+  /** Short, factual bullets — not narrative prose. */
+  architecture?: string[]
+  /** Concrete difficulties and how they were addressed. Omit rather than pad with generic filler. */
+  challenges?: { title: string; detail: string }[]
+  links?: { label: string; href: string }[]
 }
 
 export const projects: Project[] = [
@@ -25,6 +33,14 @@ export const projects: Project[] = [
     gallery: [],
     accent: '#C9A24D',
     featured: true,
+    role: 'Solo build',
+    architecture: [
+      'Next.js/React/TypeScript front end for live schedules, results and standings',
+      'Python service powering explainable football predictions',
+      'Separate Python-driven F1 prediction engine — lap time, pit strategy, tyre strategy, fastest-lap probability',
+      'Interactive Three.js circuit replay layer',
+      'Docker for local orchestration/deployment of the multi-service setup',
+    ],
   },
   {
     id: 'ecomart',
@@ -38,6 +54,14 @@ export const projects: Project[] = [
     gallery: ['/assets/graphics/ecomart-home.png', '/assets/graphics/ecomart-products.png'],
     accent: '#956959',
     featured: true,
+    role: 'Team of 5 — Introduction to Information Systems coursework',
+    timeline: 'University coursework project',
+    architecture: [
+      'Wireframed in Balsamiq before any code was written',
+      'Static HTML/CSS/JS build — Home, Products, Blog, Research and About pages',
+      'Client-side form validation with JavaScript',
+      'Working add-to-cart flow',
+    ],
   },
   {
     id: 'aqua-pure',
@@ -51,6 +75,20 @@ export const projects: Project[] = [
     gallery: [],
     accent: '#8C6D2F',
     featured: true,
+    role: 'Team project — Introduction to Robotics & IoT coursework',
+    architecture: [
+      'ESP32 microcontroller reading turbidity and pH sensors',
+      'Solenoid valve, buzzer and LED indicators driven off sensor thresholds',
+      'Live monitoring over the Blynk app',
+      'Version-controlled on GitHub',
+    ],
+    challenges: [
+      {
+        title: 'Validating across water conditions',
+        detail:
+          'Tested the rig against clean, acidic and contaminated (baking-soda) water samples to confirm the sensors and valve logic responded correctly across the range, not just in ideal conditions.',
+      },
+    ],
   },
   {
     id: 'ai-subscription-manager',
@@ -63,6 +101,13 @@ export const projects: Project[] = [
     image: null,
     gallery: [],
     accent: '#5C352C',
+    role: 'Solo — Java coursework project',
+    architecture: [
+      'Abstract AIModel parent class',
+      'ProPlan subclass — team-seat management',
+      'PersonalPlan subclass — prompt purchasing & usage tracking',
+      'SubscriptionGUI controller with file export/import',
+    ],
   },
   {
     id: 'medstore',
@@ -75,6 +120,8 @@ export const projects: Project[] = [
     image: null,
     gallery: [],
     accent: '#9C6B4F',
+    role: 'Solo — Fundamentals of Computing coursework',
+    architecture: ['Reads raw stock records from inventory.txt', 'Parses into structured data', 'Renders an aligned, formatted stock table'],
   },
   {
     id: 'crud-app',
@@ -87,6 +134,12 @@ export const projects: Project[] = [
     image: null,
     gallery: [],
     accent: '#252321',
+    role: 'Solo — self-directed backend build',
+    architecture: [
+      'Express + MongoDB (Mongoose) with EJS views',
+      'Routes → controllers → models structure',
+      'Full create, read, update and delete flows for user records',
+    ],
   },
   {
     id: 'food-dx',
@@ -104,6 +157,8 @@ export const projects: Project[] = [
       '/assets/food-dx/breakfast.png',
     ],
     accent: '#E9B48A',
+    role: 'Solo — custom front-end build',
+    architecture: ['Hero banner and product showcase', 'Testimonials section', 'Newsletter capture flow', 'Hand-built HTML/CSS/JS, no framework'],
   },
   {
     id: 'graphics-showcase',
@@ -121,6 +176,14 @@ export const projects: Project[] = [
       '/assets/graphics/music-ad.jpg',
     ],
     accent: '#B67E7D',
+    featured: true,
+    role: 'Solo design work — graphics design training',
+    architecture: [
+      'Magazine cover composition and typography (Alia)',
+      'Automotive campaign print ad — rental brand',
+      'Automotive campaign print ad — Challenger',
+      'Music/entertainment ad compositing and retouching',
+    ],
   },
 ]
 

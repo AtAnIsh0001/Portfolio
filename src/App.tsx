@@ -8,6 +8,7 @@ import RootLayout from '@/layout/RootLayout'
 import Home from '@/pages/Home'
 import ServicesPage from '@/pages/ServicesPage'
 import ProjectsPage from '@/pages/ProjectsPage'
+import ProjectDetailPage from '@/pages/ProjectDetailPage'
 import SkillsPage from '@/pages/SkillsPage'
 import ContactPage from '@/pages/ContactPage'
 
@@ -34,6 +35,7 @@ export default function App() {
               <Route index element={<Home />} />
               <Route path="services" element={<ServicesPage />} />
               <Route path="projects" element={<ProjectsPage />} />
+              <Route path="projects/:id" element={<ProjectDetailPage />} />
               <Route path="skills" element={<SkillsPage />} />
               <Route path="contact" element={<ContactPage />} />
             </Route>
